@@ -58,7 +58,7 @@ app.post("/api/users/:id/exercises", function (req, res) {
   let description = req.body.description;
   let duration = req.body.duration;
   let id = Number(req.params.id);
-  let date = new Date(req.body.date) ?? new Date();
+  let date = req.body.date ?? new Date().toDateString();
   let exerciseArray = excercises.get(id);
   exerciseArray.log.push({ description: description, duration: duration, date: date });
   res.status(200).json({ _id: id.toString(), username: users.get(id), description: description, duration: duration, date: date });
@@ -76,7 +76,8 @@ app.get("/api/users/:_id/logs", function (req, res) {
   let to = new Date(req.query.to);
   if (from && to) {
     outputArray = outputArray.filter((value, index) => {
-      return (value.date >= from && value.date <= to);
+      let exerciseDate = new Date(value.date);
+      return (exerciseDate >= from && exerciseDate <= to);
     })
   }
   //check limit
