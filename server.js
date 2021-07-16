@@ -33,7 +33,7 @@ const excercises = new Map();
 function mapToOjectArray(map) {
   let users = new Array();
   map.forEach((value, key) => {
-    users.push({ _id: key, username: value })
+    users.push({ _id: key.toString(), username: value })
   });
   return users;
 }
