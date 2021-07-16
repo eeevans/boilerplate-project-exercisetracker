@@ -44,7 +44,7 @@ app.post("/api/users", function (req, res) {
   let index = users.size + 1;
   users.set(index, username);
   excercises.set(index, { log: new Array() });
-  res.json({ _id: index, username: username });
+  res.json({ _id: index.toString(), username: username });
 });
 
 app.get("/api/users", function (req, res) {
@@ -61,7 +61,7 @@ app.post("/api/users/:id/exercises", function (req, res) {
   let date = new Date(req.body.date) ?? new Date();
   let exerciseArray = excercises.get(id);
   exerciseArray.log.push({ description: description, duration: duration, date: date });
-  res.status(200).json({ _id: id, username: users.get(id), description: description, duration: duration, date: date });
+  res.status(200).json({ _id: id.toString(), username: users.get(id), description: description, duration: duration, date: date });
 });
 
 app.get("/api/users/:_id/logs", function (req, res) {
@@ -84,7 +84,7 @@ app.get("/api/users/:_id/logs", function (req, res) {
   if (limit) {
     outputArray = outputArray.slice(0, limit);
   }
-  res.status(200).json({ _id: id, username: users.get(id), count: outputArray.length, log: outputArray });
+  res.status(200).json({ _id: id.toString(), username: users.get(id), count: outputArray.length, log: outputArray });
 });
 
 
