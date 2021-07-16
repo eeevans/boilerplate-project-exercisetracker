@@ -56,7 +56,7 @@ app.post("/api/users/:id/exercises", function (req, res) {
   console.log("post create exercise")
   console.log(JSON.stringify(req.params.id))
   let description = req.body.description;
-  let duration = req.body.duration;
+  let duration = Number(req.body.duration);
   let id = Number(req.params.id);
   let date = req.body.date ?? new Date().toDateString();
   let exerciseArray = excercises.get(id);
