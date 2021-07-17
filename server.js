@@ -52,16 +52,27 @@ app.get("/api/users", function (req, res) {
   res.status(200).json(mapToOjectArray(users));
 });
 
+function parseDate(input, format) {
+  format = format || 'yyyy-mm-dd'; // default format
+  var parts = input.match(/(\d+)/g), 
+      i = 0, fmt = {};
+  // extract date-part indexes from the format
+  format.replace(/(yyyy|dd|mm)/g, function(part) { fmt[part] = i++; });
+
+  return new Date(parts[fmt['yyyy']], parts[fmt['mm']]-1, parts[fmt['dd']]);
+}
+
 app.post("/api/users/:id/exercises", function (req, res) {
   console.log("post create exercise")
   console.log(JSON.stringify(req.params.id))
   let description = req.body.description;
   let duration = Number(req.body.duration);
   let id = Number(req.params.id);
-  let date = new Date(req.body.date) ?? new Date();
+  let date = req.body.date ? parseDate(req.body.date) : new Date();
   let exerciseArray = excercises.get(id);
   exerciseArray.log.push({ description: description, duration: duration, date: date });
-  let outputDate = date.toLocaleString('en-US', { timeZone: "UTC", day: "2-digit", month: "short", year: "numeric", weekday: "short" });
+  let outputDate = date.toDateString();
+  //toLocaleString('en-US', { timeZone: "UTC", day: "2-digit", month: "short", year: "numeric", weekday: "short" });
   outputDate = outputDate.split(",").join("");
   res.status(200).json({ _id: id.toString(), username: users.get(id), description: description, duration: duration, date: outputDate });
 });
