@@ -38,6 +38,14 @@ function mapToOjectArray(map) {
   return users;
 }
 
+function mapLogsToObjectArray(map) {
+  let logs = new Array();
+  map.forEach((element) => {
+    logs.push({ description: element.description, duration: element.duration, date: element.date.toDateString() })
+  });
+  return logs;
+}
+
 app.post("/api/users", function (req, res) {
   console.log("post create user")
   let username = req.body.username;
@@ -54,12 +62,12 @@ app.get("/api/users", function (req, res) {
 
 function parseDate(input, format) {
   format = format || 'yyyy-mm-dd'; // default format
-  var parts = input.match(/(\d+)/g), 
-      i = 0, fmt = {};
+  var parts = input.match(/(\d+)/g),
+    i = 0, fmt = {};
   // extract date-part indexes from the format
-  format.replace(/(yyyy|dd|mm)/g, function(part) { fmt[part] = i++; });
+  format.replace(/(yyyy|dd|mm)/g, function (part) { fmt[part] = i++; });
 
-  return new Date(parts[fmt['yyyy']], parts[fmt['mm']]-1, parts[fmt['dd']]);
+  return new Date(parts[fmt['yyyy']], parts[fmt['mm']] - 1, parts[fmt['dd']]);
 }
 
 app.post("/api/users/:id/exercises", function (req, res) {
@@ -72,8 +80,6 @@ app.post("/api/users/:id/exercises", function (req, res) {
   let exerciseArray = excercises.get(id);
   exerciseArray.log.push({ description: description, duration: duration, date: date });
   let outputDate = date.toDateString();
-  //toLocaleString('en-US', { timeZone: "UTC", day: "2-digit", month: "short", year: "numeric", weekday: "short" });
-  outputDate = outputDate.split(",").join("");
   res.status(200).json({ _id: id.toString(), username: users.get(id), description: description, duration: duration, date: outputDate });
 });
 
@@ -84,21 +90,24 @@ app.get("/api/users/:_id/logs", function (req, res) {
   let id = Number(req.params._id);
   let exerciseArray = excercises.get(id);
   let outputArray = exerciseArray.log.slice();
+  console.log({ step: "before range", log: outputArray });
   //check range
-  let from = new Date(req.query.from);
-  let to = new Date(req.query.to);
-  if (from && to) {
+  if (req.query.from && req.query.to) {
+    let from = parseDate(req.query.from);
+    let to = parseDate(req.query.to);
     outputArray = outputArray.filter((value, index) => {
       let exerciseDate = value.date;
       return (exerciseDate >= from && exerciseDate <= to);
     })
   }
+  console.log({ step: "after range", log: outputArray });
   //check limit
   let limit = Number(req.query.limit);
   if (limit) {
     outputArray = outputArray.slice(0, limit);
   }
-  res.status(200).json({ _id: id.toString(), username: users.get(id), count: outputArray.length, log: outputArray });
+  console.log({ step: "after limit", log: outputArray });
+  res.status(200).json({ _id: id.toString(), username: users.get(id), count: outputArray.length, log: mapLogsToObjectArray(outputArray) });
 });
 
 
