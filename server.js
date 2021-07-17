@@ -61,7 +61,9 @@ app.post("/api/users/:id/exercises", function (req, res) {
   let date = new Date(req.body.date) ?? new Date();
   let exerciseArray = excercises.get(id);
   exerciseArray.log.push({ description: description, duration: duration, date: date });
-  res.status(200).json({ _id: id.toString(), username: users.get(id), description: description, duration: duration, date: date.toLocaleString('en-US', { timeZone: "UTC", day: "2-digit", month: "short", year: "numeric", weekday: "short" }) });
+  let outputDate = date.toLocaleString('en-US', { timeZone: "UTC", day: "2-digit", month: "short", year: "numeric", weekday: "short" });
+  outputDate = outputDate.split(",").join("");
+  res.status(200).json({ _id: id.toString(), username: users.get(id), description: description, duration: duration, date: outputDate });
 });
 
 app.get("/api/users/:_id/logs", function (req, res) {
